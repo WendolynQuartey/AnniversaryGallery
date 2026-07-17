@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import MonthCollage from './components/MonthCollage';
 import Timeline from './components/Timeline';
 import MonthDisplay from './components/MonthDisplay';
-import Navigation from './components/Navigation';
 import './App.css';
 
 function App() {
@@ -17,11 +16,12 @@ function App() {
 
   const fetchMonths = async () => {
     try {
-      const response = await fetch('http://localhost:3001/api/months');
+      const response = await fetch('/api/months');
       if (!response.ok) throw new Error('Failed to fetch months');
       const data = await response.json();
       
-      // Filter from July 2025 to July 2026
+      if (data.error) throw new Error(data.error);
+      
       const filtered = data.filter(item => {
         const monthOrder = ['January', 'February', 'March', 'April', 'May', 'June', 
                            'July', 'August', 'September', 'October', 'November', 'December'];
@@ -52,21 +52,28 @@ function App() {
     setCurrentIndex((prev) => (prev - 1 + months.length) % months.length);
   };
 
-  // Auto-advance
+  // Auto-advance every 6 seconds
   useEffect(() => {
     if (months.length === 0) return;
     const interval = setInterval(nextMonth, 6000);
     return () => clearInterval(interval);
   }, [months.length]);
 
-  // Keyboard navigation
+  // Mouse wheel navigation
   useEffect(() => {
-    const handleKeyDown = (e) => {
-      if (e.key === 'ArrowRight') nextMonth();
-      if (e.key === 'ArrowLeft') prevMonth();
+    if (months.length === 0) return;
+    
+    const handleWheel = (e) => {
+      e.preventDefault();
+      if (e.deltaY > 0) {
+        nextMonth();
+      } else if (e.deltaY < 0) {
+        prevMonth();
+      }
     };
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
+    
+    window.addEventListener('wheel', handleWheel, { passive: false });
+    return () => window.removeEventListener('wheel', handleWheel);
   }, [months.length]);
 
   if (loading) return <div className="loading">📸 Loading gallery...</div>;
@@ -83,20 +90,12 @@ function App() {
         total={months.length}
       />
       
-      {/* MonthCollage now shows floating images */}
       <MonthCollage images={currentMonth.images} monthName={currentMonth.displayName} />
       
       <Timeline 
         months={months} 
         currentIndex={currentIndex} 
         onSelect={goToMonth} 
-      />
-      
-      <Navigation 
-        onPrev={prevMonth} 
-        onNext={nextMonth} 
-        currentIndex={currentIndex}
-        total={months.length}
       />
     </div>
   );

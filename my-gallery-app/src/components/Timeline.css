@@ -15,14 +15,13 @@
   height: 100%;
   overflow-y: auto;
   padding: 20px 0;
-  scrollbar-width: none; /* Hide scrollbar */
+  scrollbar-width: none;
 }
 
 .timeline-container::-webkit-scrollbar {
   display: none;
 }
 
-/* Central vertical line */
 .timeline-line {
   position: absolute;
   left: 50%;
@@ -164,7 +163,6 @@
   border: 1px solid rgba(255,255,255,0.05);
 }
 
-/* Fade gradient at edges */
 .timeline-container::before,
 .timeline-container::after {
   content: '';
@@ -187,7 +185,6 @@
   background: linear-gradient(to top, rgba(0,0,0,0.9), transparent);
 }
 
-/* Responsive */
 @media (max-width: 768px) {
   .timeline-wrapper {
     width: 40px;

@@ -14,7 +14,6 @@ const Timeline = ({ months, currentIndex, onSelect }) => {
       const containerRect = container.getBoundingClientRect();
       const centerY = containerRect.top + containerRect.height / 2;
       
-      // Get all timeline items
       const items = container.querySelectorAll('.timeline-item');
       const newVisibility = {};
       
@@ -24,7 +23,6 @@ const Timeline = ({ months, currentIndex, onSelect }) => {
         const distanceFromCenter = Math.abs(itemCenter - centerY);
         const maxDistance = containerRect.height / 2;
         
-        // Calculate opacity based on distance from center (0 = fully visible, 1 = hidden)
         const opacity = Math.max(0, 1 - (distanceFromCenter / maxDistance));
         newVisibility[index] = opacity;
       });
@@ -33,13 +31,12 @@ const Timeline = ({ months, currentIndex, onSelect }) => {
     };
 
     container.addEventListener('scroll', handleScroll);
-    // Initial calculation
     handleScroll();
     
     return () => container.removeEventListener('scroll', handleScroll);
   }, [months]);
 
-  // Scroll to active month when it changes
+  // Scroll to active month
   useEffect(() => {
     if (timelineRef.current) {
       const activeItem = timelineRef.current.querySelector('.timeline-item.active');
@@ -66,16 +63,13 @@ const Timeline = ({ months, currentIndex, onSelect }) => {
 
   const years = Object.keys(groupedMonths).sort();
 
-  // Get random position offset for scattered effect
   const getScatterOffset = (index) => {
-    // Use deterministic pseudo-random based on index for consistency
     const hash = (index * 9301 + 49297) % 233280;
-    const randomX = ((hash / 233280) * 60 - 30); // -30 to +30 pixels
-    const randomY = ((hash * 7 + 13) % 233280) / 233280 * 20 - 10; // -10 to +10 pixels
+    const randomX = ((hash / 233280) * 60 - 30);
+    const randomY = ((hash * 7 + 13) % 233280) / 233280 * 20 - 10;
     return { x: randomX, y: randomY };
   };
 
-  // Get month abbreviation
   const getMonthAbbr = (monthName) => {
     return monthName.slice(0, 3);
   };

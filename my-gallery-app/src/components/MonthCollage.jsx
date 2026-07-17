@@ -21,39 +21,18 @@ const MonthCollage = ({ images, monthName }) => {
 
   const displayImages = images.slice(0, 20);
 
-  // Simpler position generation that forces spread
   const getPosition = (index) => {
-    // Use index to create deterministic but spread-out positions
-    const angle = (index * 137.508) % 360; // Golden angle for even distribution
-    const radius = 15 + (index % 5) * 8; // Different distances from center
-    
-    // Convert to cartesian coordinates
-    const rad = angle * Math.PI / 180;
-    const centerX = 50;
-    const centerY = 45;
-    
-    let left = centerX + Math.cos(rad) * radius;
-    let top = centerY + Math.sin(rad) * radius;
-    
-    // Clamp to edges (keep 5% from edges)
-    left = Math.max(5, Math.min(95, left));
-    top = Math.max(5, Math.min(95, top));
-    
-    // Add some randomness to each position
     const seed = index * 9301 + 49297;
     const random = (seed % 233280) / 233280;
-    left += (random - 0.5) * 15;
-    top += ((random * 7 + 13) % 233280) / 233280 * 15 - 7.5;
     
-    // Clamp again
-    left = Math.max(5, Math.min(95, left));
-    top = Math.max(5, Math.min(95, top));
+    let left = 5 + random * 90;
+    let top = 5 + ((random * 7 + 13) % 233280) / 233280 * 90;
     
-    const rotation = (index * 37 + 13) % 360 - 180;
-    const size = 0.5 + (index % 7) / 10;
-    const delay = (index % 8) / 10;
-    const duration = 4 + (index % 5);
-    const amplitude = 8 + (index % 6) * 2;
+    const rotation = (random * 360 - 180);
+    const size = 0.5 + random * 0.8;
+    const delay = random * 0.8;
+    const duration = 4 + random * 4;
+    const amplitude = 8 + random * 12;
     
     return { left, top, rotation, size, delay, duration, amplitude };
   };
@@ -83,7 +62,16 @@ const MonthCollage = ({ images, monthName }) => {
               alt={`${monthName} - Photo ${index + 1}`}
               className="floating-img"
               loading="lazy"
+              onError={(e) => {
+                console.log('Failed to load:', src);
+                e.target.style.display = 'none';
+              }}
             />
+            {isLoaded && (
+              <div className="image-overlay">
+                <span className="photo-number">#{index + 1}</span>
+              </div>
+            )}
           </div>
         );
       })}

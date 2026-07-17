@@ -30,3 +30,9 @@
   text-shadow: 0 0 20px rgba(0,0,0,0.8);
   letter-spacing: 2px;
 }
+
+@media (max-width: 768px) {
+  .month-display h1 {
+    font-size: 3rem;
+  }
+}
