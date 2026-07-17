@@ -33,107 +33,105 @@ const MonthCollage = ({ images, monthName }) => {
     });
   }, [images]);
 
-  // Show up to 20 images
-  const displayImages = images.slice(0, 20);
+  // Show up to 16 images so the larger photos stay spaced out and readable
+  const displayImages = images.slice(0, 16);
 
-  // STRICT positioning with LARGER images
+  // Keep images in outer zones so they stay visible and away from the centered timeline
   const getStrictPosition = (index, existingPositions) => {
     const seed = index * 9301 + 49297;
     const random = (seed % 233280) / 233280;
-    
-    // MUCH LARGER image size (24% of viewport)
+
     const sizePercent = 24;
-    
-    // CENTER KEEP-OUT ZONE - Larger to protect timeline
-    const centerMin = 28;
-    const centerMax = 72;
-    
-    let left, top;
-    let attempts = 0;
-    let maxAttempts = 200;
-    let validPosition = false;
-    
-    while (!validPosition && attempts < maxAttempts) {
-      // Force images to the EDGES only
-      const zone = Math.floor((random + attempts * 0.05) % 4);
-      
-      switch(zone) {
-        case 0: // TOP
-          left = 2 + ((random + attempts * 0.03) % 1) * 96;
-          top = 1 + ((random * 3 + attempts * 0.02) % 1) * (centerMin - 8);
-          break;
-        case 1: // BOTTOM
-          left = 2 + ((random + attempts * 0.04) % 1) * 96;
-          top = centerMax + 8 + ((random * 3 + attempts * 0.03) % 1) * (96 - centerMax);
-          break;
-        case 2: // LEFT
-          left = 1 + ((random + attempts * 0.02) % 1) * (centerMin - 8);
-          top = 2 + ((random * 3 + attempts * 0.02) % 1) * 96;
-          break;
-        case 3: // RIGHT
-          left = centerMax + 8 + ((random + attempts * 0.02) % 1) * (96 - centerMax);
-          top = 2 + ((random * 3 + attempts * 0.02) % 1) * 96;
-          break;
-        default:
-          left = 2 + ((random + attempts * 0.01) % 1) * 96;
-          top = 2 + ((random * 3 + attempts * 0.01) % 1) * 96;
-      }
-      
-      // Add slight randomness for organic feel
-      left += (random - 0.5) * 3;
-      top += ((random * 3 + 7) % 1) * 3 - 1.5;
-      
-      // Clamp to keep images on screen
-      left = Math.max(0.5, Math.min(100 - sizePercent - 0.5, left));
-      top = Math.max(0.5, Math.min(100 - sizePercent - 0.5, top));
-      
-      // DOUBLE CHECK: Is this image in the center zone?
+    const timelineXMin = 38;
+    const timelineXMax = 62;
+    const timelineYMin = 16;
+    const timelineYMax = 84;
+
+    const candidateAnchors = [
+      { left: 4, top: 6 },
+      { left: 74, top: 6 },
+      { left: 4, top: 28 },
+      { left: 74, top: 28 },
+      { left: 4, top: 50 },
+      { left: 74, top: 50 },
+      { left: 4, top: 72 },
+      { left: 74, top: 72 },
+      { left: 18, top: 10 },
+      { left: 70, top: 10 },
+      { left: 18, top: 80 },
+      { left: 70, top: 80 },
+      { left: 12, top: 20 },
+      { left: 76, top: 20 },
+      { left: 12, top: 68 },
+      { left: 76, top: 68 },
+      { left: 8, top: 40 },
+      { left: 80, top: 40 }
+    ];
+
+    let validPosition = null;
+
+    for (let attempt = 0; attempt < candidateAnchors.length * 3; attempt++) {
+      const anchor = candidateAnchors[(index + attempt) % candidateAnchors.length];
+      const jitterX = ((random + attempt * 0.07) % 1) * 8 - 4;
+      const jitterY = (((random * 3) + attempt * 0.09) % 1) * 8 - 4;
+
+      let left = anchor.left + jitterX;
+      let top = anchor.top + jitterY;
+
+      left = Math.max(2, Math.min(100 - sizePercent - 2, left));
+      top = Math.max(2, Math.min(100 - sizePercent - 2, top));
+
       const imageCenterX = left + sizePercent / 2;
       const imageCenterY = top + sizePercent / 2;
-      
-      const inCenterZone = 
-        imageCenterX > centerMin && imageCenterX < centerMax &&
-        imageCenterY > centerMin && imageCenterY < centerMax;
-      
-      if (inCenterZone) {
-        attempts++;
+
+      const inTimelineZone =
+        imageCenterX > timelineXMin &&
+        imageCenterX < timelineXMax &&
+        imageCenterY > timelineYMin &&
+        imageCenterY < timelineYMax;
+
+      if (inTimelineZone) {
         continue;
       }
-      
-      // Check collision with existing images (more spacing for larger images)
+
       let collides = false;
-      const minDistance = sizePercent * 1.25;
-      
+      const minDistance = sizePercent * 1.45;
+
       for (const pos of existingPositions) {
         const dx = Math.abs(left - pos.left);
         const dy = Math.abs(top - pos.top);
         const distance = Math.sqrt(dx * dx + dy * dy);
-        
+
         if (distance < minDistance) {
           collides = true;
           break;
         }
       }
-      
+
       if (!collides) {
-        validPosition = true;
+        validPosition = { left, top };
+        break;
       }
-      
-      attempts++;
     }
-    
-    // Random rotation for scrapbook feel (slightly less for larger images)
+
+    if (!validPosition) {
+      validPosition = {
+        left: (index % 2 === 0 ? 6 : 78) + (random - 0.5) * 6,
+        top: 8 + ((index % 4) * 18) + (random * 6)
+      };
+    }
+
     const rotation = (random - 0.5) * 25;
-    const delay = (random * 0.3);
+    const delay = random * 0.3;
     const duration = 4 + random * 4;
     const amplitude = 5 + random * 8;
-    
-    return { 
-      left, 
-      top, 
-      rotation, 
-      delay, 
-      duration, 
+
+    return {
+      left: validPosition.left,
+      top: validPosition.top,
+      rotation,
+      delay,
+      duration,
       amplitude,
       sizePercent
     };
