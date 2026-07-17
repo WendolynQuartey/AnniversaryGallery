@@ -24,7 +24,7 @@ function App() {
   //   // Function to start audio
   //   const startAudio = () => {
   //     if (audioStarted) return;
-      
+
   //     audio.play()
   //       .then(() => {
   //         console.log('🎵 Music started');
@@ -66,22 +66,22 @@ function App() {
 
   const fetchMonths = async () => {
     try {
-      const response = await fetch('/api/months');
+      // Fetch from the static JSON file instead of the API
+      const response = await fetch('/months.json');
       if (!response.ok) throw new Error('Failed to fetch months');
       const data = await response.json();
-      
-      if (data.error) throw new Error(data.error);
-      
-      const filtered = data.filter(item => {
-        const monthOrder = ['January', 'February', 'March', 'April', 'May', 'June', 
-                           'July', 'August', 'September', 'October', 'November', 'December'];
+
+      // Filter months from July 2025 to July 2026
+      const monthOrder = ['January', 'February', 'March', 'April', 'May', 'June',
+        'July', 'August', 'September', 'October', 'November', 'December'];
+
+      const filtered = data.months.filter(item => {
         const monthIndex = monthOrder.indexOf(item.month);
-        
         if (item.year === 2025 && monthIndex >= 6) return true;
         if (item.year === 2026 && monthIndex <= 6) return true;
         return false;
       });
-      
+
       setMonths(filtered);
       setLoading(false);
     } catch (err) {
@@ -112,7 +112,7 @@ function App() {
   // Mouse wheel navigation
   useEffect(() => {
     if (months.length === 0) return;
-    
+
     const handleWheel = (e) => {
       e.preventDefault();
       if (e.deltaY > 0) {
@@ -121,7 +121,7 @@ function App() {
         prevMonth();
       }
     };
-    
+
     window.addEventListener('wheel', handleWheel, { passive: false });
     return () => window.removeEventListener('wheel', handleWheel);
   }, [months.length]);
@@ -134,20 +134,20 @@ function App() {
 
   return (
     <div className="app">
-       <BackgroundMusic />
-      
-      <MonthDisplay 
-        month={currentMonth.displayName} 
+      <BackgroundMusic />
+
+      <MonthDisplay
+        month={currentMonth.displayName}
         index={currentIndex}
         total={months.length}
       />
-      
+
       <MonthCollage images={currentMonth.images} monthName={currentMonth.displayName} />
-      
-      <Timeline 
-        months={months} 
-        currentIndex={currentIndex} 
-        onSelect={goToMonth} 
+
+      <Timeline
+        months={months}
+        currentIndex={currentIndex}
+        onSelect={goToMonth}
       />
     </div>
   );
