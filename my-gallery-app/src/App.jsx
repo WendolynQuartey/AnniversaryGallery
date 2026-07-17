@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import MonthCollage from './components/MonthCollage';
-import Navigation from './components/Navigation';
-import MonthDisplay from './components/MonthDisplay';
 import Timeline from './components/Timeline';
+import MonthDisplay from './components/MonthDisplay';
+import Navigation from './components/Navigation';
 import './App.css';
 
 function App() {
@@ -27,8 +27,8 @@ function App() {
                            'July', 'August', 'September', 'October', 'November', 'December'];
         const monthIndex = monthOrder.indexOf(item.month);
         
-        if (item.year === 2025 && monthIndex >= 6) return true; // July or later
-        if (item.year === 2026 && monthIndex <= 6) return true; // July or earlier
+        if (item.year === 2025 && monthIndex >= 6) return true;
+        if (item.year === 2026 && monthIndex <= 6) return true;
         return false;
       });
       
@@ -52,7 +52,7 @@ function App() {
     setCurrentIndex((prev) => (prev - 1 + months.length) % months.length);
   };
 
-  // Auto-advance every 6 seconds
+  // Auto-advance
   useEffect(() => {
     if (months.length === 0) return;
     const interval = setInterval(nextMonth, 6000);
@@ -82,12 +82,16 @@ function App() {
         index={currentIndex}
         total={months.length}
       />
+      
+      {/* MonthCollage now shows floating images */}
       <MonthCollage images={currentMonth.images} monthName={currentMonth.displayName} />
+      
       <Timeline 
         months={months} 
         currentIndex={currentIndex} 
         onSelect={goToMonth} 
       />
+      
       <Navigation 
         onPrev={prevMonth} 
         onNext={nextMonth} 

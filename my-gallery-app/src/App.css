@@ -14,6 +14,7 @@ body {
   width: 100vw;
   height: 100vh;
   position: relative;
+  background: radial-gradient(ellipse at center, #1a1a1a 0%, #0a0a0a 100%);
 }
 
 .loading, .error {
@@ -28,4 +29,13 @@ body {
 
 .error {
   color: #ff6b6b;
+}
+
+/* Make sure timeline is clickable through floating images */
+.floating-images-container {
+  pointer-events: none;
+}
+
+.floating-images-container .floating-image {
+  pointer-events: auto; /* But images themselves are clickable if needed */
 }
