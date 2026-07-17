@@ -1,17 +1,12 @@
 {
+  "version": 3,
   "builds": [
     {
-      "src": "my-gallery-app/package.json",
+      "src": "package.json",
       "use": "@vercel/static-build",
       "config": {
-        "distDir": "my-gallery-app/dist"
+        "distDir": "dist"
       }
-    }
-  ],
-  "routes": [
-    {
-      "src": "/(.*)",
-      "dest": "/my-gallery-app/dist/$1"
     }
   ]
 }
