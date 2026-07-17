@@ -42,42 +42,46 @@ const MonthCollage = ({ images, monthName }) => {
     const random = (seed % 233280) / 233280;
 
     const sizePercent = 24;
-    const timelineXMin = 40;
-    const timelineXMax = 60;
-    const timelineYMin = 16;
-    const timelineYMax = 84;
+    const timelineXMin = 42;
+    const timelineXMax = 58;
+    const timelineYMin = 14;
+    const timelineYMax = 86;
 
     const candidateAnchors = [
-      { left: 4, top: 4 },
-      { left: 76, top: 4 },
-      { left: 4, top: 24 },
-      { left: 76, top: 24 },
-      { left: 4, top: 46 },
-      { left: 76, top: 46 },
-      { left: 4, top: 70 },
-      { left: 76, top: 70 },
-      { left: 18, top: 8 },
-      { left: 64, top: 8 },
-      { left: 18, top: 78 },
-      { left: 64, top: 78 },
-      { left: 14, top: 18 },
+      { left: 2, top: 2 },
+      { left: 78, top: 2 },
+      { left: 2, top: 24 },
+      { left: 78, top: 24 },
+      { left: 2, top: 48 },
+      { left: 78, top: 48 },
+      { left: 2, top: 74 },
+      { left: 78, top: 74 },
+      { left: 18, top: 6 },
+      { left: 64, top: 6 },
+      { left: 18, top: 80 },
+      { left: 64, top: 80 },
+      { left: 12, top: 18 },
       { left: 70, top: 18 },
-      { left: 14, top: 64 },
+      { left: 12, top: 64 },
       { left: 70, top: 64 },
-      { left: 24, top: 36 },
-      { left: 60, top: 36 },
-      { left: 30, top: 12 },
-      { left: 54, top: 12 },
-      { left: 30, top: 74 },
-      { left: 54, top: 74 }
+      { left: 24, top: 34 },
+      { left: 60, top: 34 },
+      { left: 30, top: 10 },
+      { left: 54, top: 10 },
+      { left: 30, top: 76 },
+      { left: 54, top: 76 },
+      { left: 36, top: 8 },
+      { left: 44, top: 8 },
+      { left: 36, top: 78 },
+      { left: 44, top: 78 }
     ];
 
     let validPosition = null;
 
     for (let attempt = 0; attempt < candidateAnchors.length * 3; attempt++) {
       const anchor = candidateAnchors[(index + attempt) % candidateAnchors.length];
-      const jitterX = ((random + attempt * 0.07) % 1) * 8 - 4;
-      const jitterY = (((random * 3) + attempt * 0.09) % 1) * 8 - 4;
+      const jitterX = ((random + attempt * 0.07) % 1) * 10 - 5;
+      const jitterY = (((random * 3) + attempt * 0.09) % 1) * 10 - 5;
 
       let left = anchor.left + jitterX;
       let top = anchor.top + jitterY;
@@ -99,7 +103,7 @@ const MonthCollage = ({ images, monthName }) => {
       }
 
       let collides = false;
-      const minDistance = sizePercent * 1.25;
+      const minDistance = sizePercent * 1.22;
 
       for (const pos of existingPositions) {
         const dx = Math.abs(left - pos.left);
@@ -120,8 +124,8 @@ const MonthCollage = ({ images, monthName }) => {
 
     if (!validPosition) {
       validPosition = {
-        left: (index % 2 === 0 ? 14 : 68) + (random - 0.5) * 6,
-        top: 8 + ((index % 4) * 18) + (random * 6)
+        left: (index % 2 === 0 ? 14 : 68) + (random - 0.5) * 8,
+        top: 6 + ((index % 4) * 20) + (random * 8)
       };
     }
 
