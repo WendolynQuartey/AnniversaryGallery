@@ -1,0 +1,40 @@
+.collage-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  grid-template-rows: repeat(3, 1fr);
+  gap: 6px;
+  width: 100vw;
+  height: 100vh;
+  padding: 6px;
+  position: relative;
+  background: #0a0a0a;
+}
+
+.collage-item {
+  overflow: hidden;
+  position: relative;
+  background: #1a1a1a;
+}
+
+.collage-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0;
+  transition: opacity 0.8s ease;
+}
+
+.collage-image.loaded {
+  opacity: 1;
+}
+
+.collage-placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 3rem;
+  background: #1a1a1a;
+  color: #333;
+}
