@@ -8,7 +8,6 @@ const MonthCollage = ({ images, monthName }) => {
     height: window.innerHeight
   });
 
-  // Track window resize
   useEffect(() => {
     const handleResize = () => {
       setWindowSize({
@@ -22,7 +21,6 @@ const MonthCollage = ({ images, monthName }) => {
 
   useEffect(() => {
     setLoadedImages([]);
-    
     images.forEach((src, index) => {
       const img = new Image();
       img.onload = () => {
@@ -35,88 +33,76 @@ const MonthCollage = ({ images, monthName }) => {
     });
   }, [images]);
 
-  const displayImages = images.slice(0, 25);
+  // Show up to 20 images
+  const displayImages = images.slice(0, 20);
 
-  // Scrapbook-style positioning with STRICT collision avoidance
-  const getScrapbookPosition = (index, existingPositions, viewportWidth, viewportHeight) => {
+  // STRICT positioning with LARGER images
+  const getStrictPosition = (index, existingPositions) => {
     const seed = index * 9301 + 49297;
     const random = (seed % 233280) / 233280;
     
-    // IMAGE SIZE: Large but with room for spacing
-    const baseSize = Math.min(viewportWidth, viewportHeight) * 0.22; // 22% of smaller dimension
-    const sizeVariation = 0.7 + random * 0.6; // 70% to 130% of base
-    const imageSize = Math.min(baseSize * sizeVariation, viewportWidth * 0.35, viewportHeight * 0.35);
+    // MUCH LARGER image size (20% of viewport)
+    const sizePercent = 20; // Was 12, now 20!
     
-    // Convert to percentage of viewport for positioning
-    const sizePercent = (imageSize / Math.min(viewportWidth, viewportHeight)) * 100;
-    
-    // Keep-out zone to protect the timeline (30% to 70% of screen)
-    const centerMin = 30;
-    const centerMax = 70;
+    // CENTER KEEP-OUT ZONE - Larger to protect timeline
+    const centerMin = 32; // Left boundary (was 28)
+    const centerMax = 68; // Right boundary (was 72)
     
     let left, top;
     let attempts = 0;
-    let maxAttempts = 100; // More attempts to find non-overlapping positions
-    let collision = true;
+    let maxAttempts = 200;
+    let validPosition = false;
     
-    // Padding to keep images fully on screen
-    const padding = sizePercent * 0.2;
-    
-    while (collision && attempts < maxAttempts) {
-      // Spread across the ENTIRE screen, but avoid center
-      const positionType = Math.floor((random + attempts * 0.07) % 8);
+    while (!validPosition && attempts < maxAttempts) {
+      // Force images to the EDGES only
+      const zone = Math.floor((random + attempts * 0.05) % 4);
       
-      switch(positionType) {
-        case 0: // Top area
-          left = padding + ((random + attempts * 0.05) % 1) * (100 - padding * 2);
-          top = padding + ((random * 2 + attempts * 0.03) % 1) * (centerMin - padding - 3);
+      switch(zone) {
+        case 0: // TOP
+          left = 2 + ((random + attempts * 0.03) % 1) * 96;
+          top = 1 + ((random * 3 + attempts * 0.02) % 1) * (centerMin - 8);
           break;
-        case 1: // Bottom area
-          left = padding + ((random + attempts * 0.06) % 1) * (100 - padding * 2);
-          top = centerMax + ((random * 2 + attempts * 0.04) % 1) * (100 - centerMax - padding - 3);
+        case 1: // BOTTOM
+          left = 2 + ((random + attempts * 0.04) % 1) * 96;
+          top = centerMax + 8 + ((random * 3 + attempts * 0.03) % 1) * (96 - centerMax);
           break;
-        case 2: // Left area
-          left = padding + ((random + attempts * 0.04) % 1) * (centerMin - padding - 3);
-          top = padding + ((random * 4 + attempts * 0.02) % 1) * (100 - padding * 2);
+        case 2: // LEFT
+          left = 1 + ((random + attempts * 0.02) % 1) * (centerMin - 8);
+          top = 2 + ((random * 3 + attempts * 0.02) % 1) * 96;
           break;
-        case 3: // Right area
-          left = centerMax + ((random + attempts * 0.08) % 1) * (100 - centerMax - padding - 3);
-          top = padding + ((random * 4 + attempts * 0.02) % 1) * (100 - padding * 2);
-          break;
-        case 4: // Top-Left corner
-          left = padding + ((random + attempts * 0.03) % 1) * (centerMin - padding - 3);
-          top = padding + ((random * 2 + attempts * 0.03) % 1) * (centerMin - padding - 3);
-          break;
-        case 5: // Top-Right corner
-          left = centerMax + ((random + attempts * 0.07) % 1) * (100 - centerMax - padding - 3);
-          top = padding + ((random * 2 + attempts * 0.03) % 1) * (centerMin - padding - 3);
-          break;
-        case 6: // Bottom-Left corner
-          left = padding + ((random + attempts * 0.03) % 1) * (centerMin - padding - 3);
-          top = centerMax + ((random * 2 + attempts * 0.03) % 1) * (100 - centerMax - padding - 3);
-          break;
-        case 7: // Bottom-Right corner
-          left = centerMax + ((random + attempts * 0.07) % 1) * (100 - centerMax - padding - 3);
-          top = centerMax + ((random * 2 + attempts * 0.03) % 1) * (100 - centerMax - padding - 3);
+        case 3: // RIGHT
+          left = centerMax + 8 + ((random + attempts * 0.02) % 1) * (96 - centerMax);
+          top = 2 + ((random * 3 + attempts * 0.02) % 1) * 96;
           break;
         default:
-          left = padding + ((random + attempts * 0.01) % 1) * (100 - padding * 2);
-          top = padding + ((random * 7 + 13 + attempts * 0.01) % 1) * (100 - padding * 2);
+          left = 2 + ((random + attempts * 0.01) % 1) * 96;
+          top = 2 + ((random * 3 + attempts * 0.01) % 1) * 96;
       }
       
-      // Add organic randomness
-      left += (random - 0.5) * 4;
-      top += ((random * 3 + 7) % 1) * 4 - 2;
+      // Add slight randomness for organic feel
+      left += (random - 0.5) * 3;
+      top += ((random * 3 + 7) % 1) * 3 - 1.5;
       
-      // Ensure images stay fully on screen
-      const maxLeft = 100 - sizePercent - 0.5;
-      const maxTop = 100 - sizePercent - 0.5;
-      left = Math.max(padding + 0.5, Math.min(maxLeft, left));
-      top = Math.max(padding + 0.5, Math.min(maxTop, top));
+      // Clamp to keep images on screen
+      left = Math.max(0.5, Math.min(100 - sizePercent - 0.5, left));
+      top = Math.max(0.5, Math.min(100 - sizePercent - 0.5, top));
       
-      // STRICT collision check - images must not overlap at all
-      collision = false;
-      const minDistance = sizePercent * 1.2; // 20% extra space between images
+      // DOUBLE CHECK: Is this image in the center zone?
+      const imageCenterX = left + sizePercent / 2;
+      const imageCenterY = top + sizePercent / 2;
+      
+      const inCenterZone = 
+        imageCenterX > centerMin && imageCenterX < centerMax &&
+        imageCenterY > centerMin && imageCenterY < centerMax;
+      
+      if (inCenterZone) {
+        attempts++;
+        continue;
+      }
+      
+      // Check collision with existing images (more spacing for larger images)
+      let collides = false;
+      const minDistance = sizePercent * 1.2; // 20% buffer between images
       
       for (const pos of existingPositions) {
         const dx = Math.abs(left - pos.left);
@@ -124,40 +110,40 @@ const MonthCollage = ({ images, monthName }) => {
         const distance = Math.sqrt(dx * dx + dy * dy);
         
         if (distance < minDistance) {
-          collision = true;
+          collides = true;
           break;
         }
+      }
+      
+      if (!collides) {
+        validPosition = true;
       }
       
       attempts++;
     }
     
-    // Wider rotation range for more character
-    const rotation = (random - 0.5) * 45; // -22.5° to +22.5°
-    
-    // Random animation properties
+    // Random rotation for scrapbook feel (slightly less for larger images)
+    const rotation = (random - 0.5) * 25;
     const delay = (random * 0.3);
     const duration = 4 + random * 4;
-    const amplitude = 8 + random * 12;
+    const amplitude = 5 + random * 8;
     
     return { 
       left, 
       top, 
       rotation, 
-      size: imageSize / 150, // Normalize to CSS base size
       delay, 
       duration, 
       amplitude,
-      sizePercent,
-      pixelSize: imageSize
+      sizePercent
     };
   };
 
-  // Generate all positions with collision avoidance
+  // Generate all positions
   const generatePositions = () => {
     const positions = [];
     for (let i = 0; i < displayImages.length; i++) {
-      const pos = getScrapbookPosition(i, positions, windowSize.width, windowSize.height);
+      const pos = getStrictPosition(i, positions);
       positions.push(pos);
     }
     return positions;
@@ -171,25 +157,25 @@ const MonthCollage = ({ images, monthName }) => {
         const pos = positions[index];
         const isLoaded = loadedImages.includes(index);
         
-        // Calculate pixel dimensions
-        const pixelSize = pos ? pos.pixelSize : 200;
-        const finalSize = Math.min(pixelSize, windowSize.width * 0.40, windowSize.height * 0.40);
+        // Calculate pixel size - MUCH LARGER!
+        const baseSize = Math.min(windowSize.width, windowSize.height) * 0.20; // 20% of viewport
+        const finalSize = Math.min(baseSize, windowSize.width * 0.32, windowSize.height * 0.32);
         
         return (
           <div
             key={index}
             className={`floating-image-item scrapbook-style ${isLoaded ? 'loaded' : ''}`}
             style={{
-              left: `${pos ? pos.left : 10}%`,
-              top: `${pos ? pos.top : 10}%`,
-              width: `${Math.max(finalSize, 130)}px`,
-              height: `${Math.max(finalSize, 130)}px`,
-              transform: `rotate(${pos ? pos.rotation : 0}deg)`,
-              animationDelay: `${pos ? pos.delay : 0}s`,
-              animationDuration: `${pos ? pos.duration : 5}s`,
-              '--float-amplitude': `${pos ? pos.amplitude : 12}px`,
-              '--rotation': `${pos ? pos.rotation : 0}deg`,
-              zIndex: Math.floor(pos ? pos.top : 50)
+              left: `${pos.left}%`,
+              top: `${pos.top}%`,
+              width: `${Math.max(finalSize, 160)}px`, // Min 160px
+              height: `${Math.max(finalSize, 160)}px`,
+              transform: `rotate(${pos.rotation}deg)`,
+              animationDelay: `${pos.delay}s`,
+              animationDuration: `${pos.duration}s`,
+              '--float-amplitude': `${pos.amplitude}px`,
+              '--rotation': `${pos.rotation}deg`,
+              zIndex: Math.floor(pos.top)
             }}
           >
             <img 
@@ -202,7 +188,6 @@ const MonthCollage = ({ images, monthName }) => {
                 e.target.style.display = 'none';
               }}
             />
-            {/* Scrapbook-style tape decoration */}
             <div className="scrapbook-tape"></div>
             {isLoaded && (
               <div className="image-overlay">
