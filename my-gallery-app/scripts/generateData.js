@@ -5,22 +5,23 @@ import { fileURLToPath } from 'url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// Path to your photos folder (relative to the script)
+// Look for photos in the public folder
 const photosPath = path.resolve(__dirname, '../public/photos');
 const outputPath = path.resolve(__dirname, '../public/months.json');
 
+console.log(`📁 Looking for photos in: ${photosPath}`);
+
+// Ensure the public folder exists
+if (!fs.existsSync(path.dirname(outputPath))) {
+  fs.mkdirSync(path.dirname(outputPath), { recursive: true });
+}
+
 const months = [];
 
-try {
-  // Check if photos folder exists
-  if (!fs.existsSync(photosPath)) {
-    console.error(`Photos folder not found at: ${photosPath}`);
-    console.log('Creating empty months.json for build...');
-    fs.writeFileSync(outputPath, JSON.stringify({ months: [] }, null, 2));
-    process.exit(0);
-  }
-
+if (fs.existsSync(photosPath)) {
+  console.log('✅ Photos folder found!');
   const folders = fs.readdirSync(photosPath);
+  console.log(`📂 Found ${folders.length} folders`);
   
   const monthOrder = ['January', 'February', 'March', 'April', 'May', 'June', 
                       'July', 'August', 'September', 'October', 'November', 'December'];
@@ -33,7 +34,10 @@ try {
     const month = parts.slice(0, -1).join(' ');
     const year = parseInt(parts[parts.length - 1]);
 
-    if (isNaN(year) || !monthOrder.includes(month)) return;
+    if (isNaN(year) || !monthOrder.includes(month)) {
+      console.log(`⚠️ Skipping invalid folder: ${folder}`);
+      return;
+    }
 
     const files = fs.readdirSync(folderPath);
     const images = files
@@ -47,20 +51,19 @@ try {
         displayName: `${month} ${year}`,
         images: images
       });
+      console.log(`📸 Found ${images.length} images in ${folder}`);
     }
   });
 
-  // Sort months chronologically
   months.sort((a, b) => {
     if (a.year !== b.year) return a.year - b.year;
     return monthOrder.indexOf(a.month) - monthOrder.indexOf(b.month);
   });
-
-  fs.writeFileSync(outputPath, JSON.stringify({ months }, null, 2));
-  console.log(`✅ Generated months.json with ${months.length} months`);
-
-} catch (error) {
-  console.error('Error generating months.json:', error);
-  // Create empty file to prevent build failure
-  fs.writeFileSync(outputPath, JSON.stringify({ months: [] }, null, 2));
+} else {
+  console.log(`❌ Photos folder NOT found at: ${photosPath}`);
+  console.log('💡 Make sure your photos are in: my-gallery-app/public/photos/');
 }
+
+fs.writeFileSync(outputPath, JSON.stringify({ months }, null, 2));
+console.log(`✅ Generated ${outputPath} with ${months.length} months`);
+console.log(`📸 Total images: ${months.reduce((acc, m) => acc + m.images.length, 0)}`);
