@@ -1,0 +1,7 @@
+{
+  "name": "anniversary-gallery",
+  "version": "1.0.0",
+  "scripts": {
+    "build": "cd my-gallery-app && npm run build"
+  }
+}
