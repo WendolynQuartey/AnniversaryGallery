@@ -67,7 +67,7 @@ function App() {
   const fetchMonths = async () => {
     try {
       // Fetch from the static JSON file instead of the API
-      const response = await fetch('/months.json');
+      const response = await fetch("../public/months.json");
       if (!response.ok) throw new Error('Failed to fetch months');
       const data = await response.json();
 
