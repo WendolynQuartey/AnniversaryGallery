@@ -12,10 +12,10 @@
 
 .floating-image-item.scrapbook-style {
   position: absolute;
-  min-width: 160px; /* Increased from 100px */
-  min-height: 160px; /* Increased from 100px */
-  max-width: 450px; /* Increased from 300px */
-  max-height: 450px; /* Increased from 300px */
+  min-width: 220px;
+  min-height: 220px;
+  max-width: 560px;
+  max-height: 560px;
   opacity: 0;
   border-radius: 10px; /* Slightly larger radius */
   overflow: visible;
@@ -28,7 +28,7 @@
   will-change: transform, opacity;
   transform-origin: center center;
   background: rgba(255, 255, 255, 0.03);
-  padding: 14px 14px 14px 14px; /* More padding for larger images */
+  padding: 18px;
   box-shadow: 
     0 10px 50px rgba(0, 0, 0, 0.5),
     0 0 0 1px rgba(255, 255, 255, 0.03);
@@ -231,11 +231,11 @@
 
 @media (max-width: 768px) {
   .floating-image-item.scrapbook-style {
-    min-width: 120px;
-    min-height: 120px;
-    max-width: 250px;
-    max-height: 250px;
-    padding: 10px;
+    min-width: 180px;
+    min-height: 180px;
+    max-width: 320px;
+    max-height: 320px;
+    padding: 12px;
   }
   
   .scrapbook-tape {

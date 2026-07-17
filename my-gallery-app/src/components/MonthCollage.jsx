@@ -41,12 +41,12 @@ const MonthCollage = ({ images, monthName }) => {
     const seed = index * 9301 + 49297;
     const random = (seed % 233280) / 233280;
     
-    // MUCH LARGER image size (20% of viewport)
-    const sizePercent = 20; // Was 12, now 20!
+    // MUCH LARGER image size (24% of viewport)
+    const sizePercent = 24;
     
     // CENTER KEEP-OUT ZONE - Larger to protect timeline
-    const centerMin = 32; // Left boundary (was 28)
-    const centerMax = 68; // Right boundary (was 72)
+    const centerMin = 28;
+    const centerMax = 72;
     
     let left, top;
     let attempts = 0;
@@ -102,7 +102,7 @@ const MonthCollage = ({ images, monthName }) => {
       
       // Check collision with existing images (more spacing for larger images)
       let collides = false;
-      const minDistance = sizePercent * 1.2; // 20% buffer between images
+      const minDistance = sizePercent * 1.25;
       
       for (const pos of existingPositions) {
         const dx = Math.abs(left - pos.left);
@@ -158,8 +158,8 @@ const MonthCollage = ({ images, monthName }) => {
         const isLoaded = loadedImages.includes(index);
         
         // Calculate pixel size - MUCH LARGER!
-        const baseSize = Math.min(windowSize.width, windowSize.height) * 0.20; // 20% of viewport
-        const finalSize = Math.min(baseSize, windowSize.width * 0.32, windowSize.height * 0.32);
+        const baseSize = Math.min(windowSize.width, windowSize.height) * 0.24;
+        const finalSize = Math.min(baseSize, windowSize.width * 0.36, windowSize.height * 0.36);
         
         return (
           <div
@@ -168,8 +168,8 @@ const MonthCollage = ({ images, monthName }) => {
             style={{
               left: `${pos.left}%`,
               top: `${pos.top}%`,
-              width: `${Math.max(finalSize, 160)}px`, // Min 160px
-              height: `${Math.max(finalSize, 160)}px`,
+              width: `${Math.max(finalSize, 220)}px`,
+              height: `${Math.max(finalSize, 220)}px`,
               transform: `rotate(${pos.rotation}deg)`,
               animationDelay: `${pos.delay}s`,
               animationDuration: `${pos.duration}s`,
